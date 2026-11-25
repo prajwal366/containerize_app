@@ -1,0 +1,1833 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f172a" />
+    <title>Campus Portal — Student Timetable</title>
+    <style>
+        :root {
+            --navy: #111827;
+            --navy-soft: #1f2937;
+            --primary: #4f46e5;
+            --primary-soft: #eef2ff;
+            --cyan: #0891b2;
+            --green: #059669;
+            --amber: #d97706;
+            --ink: #172033;
+            --muted: #6b7280;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --line: #e6eaf0;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+            background: var(--bg);
+            color: var(--ink);
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        .app {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 248px 1fr;
+        }
+
+        aside {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            padding: 26px 18px 20px;
+            background:
+                radial-gradient(circle at 20% 85%, rgba(79, 70, 229, .25), transparent 30%),
+                linear-gradient(160deg, #111827 0%, #172554 62%, #1e3a8a 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 12px 0 30px rgba(15, 23, 42, .08);
+        }
+
+        #campusSidebar::before {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            left: -120px;
+            top: 120px;
+            border-radius: 50%;
+            background: rgba(96, 165, 250, .12);
+            filter: blur(2px);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin: 0 8px 34px;
+        }
+
+        .brand-mark {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #818cf8, #4f46e5);
+            box-shadow: 0 8px 20px #4f46e54d;
+        }
+
+        nav {
+            display: grid;
+            gap: 6px;
+        }
+
+        nav button {
+            position: relative;
+            width: 100%;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 13px 14px;
+            color: #c7d2fe;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        nav button span {
+            display: inline-block;
+            width: 28px;
+            text-align: center;
+            color: #93c5fd;
+        }
+
+        nav button.active,
+        nav button:hover {
+            background: linear-gradient(90deg, rgba(96, 165, 250, .22), rgba(129, 140, 248, .12));
+            border-color: rgba(147, 197, 253, .16);
+            color: white;
+            transform: translateX(2px);
+            box-shadow: inset 3px 0 0 #60a5fa;
+        }
+
+        .profile-mini {
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, .1);
+            padding: 18px 8px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-mini .avatar {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+
+        .profile-mini strong,
+        .profile-mini small {
+            display: block;
+        }
+
+        .profile-mini small {
+            color: #9ca3af;
+            margin-top: 2px;
+        }
+
+        main {
+            min-width: 0;
+            padding: 26px 36px 48px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            gap: 20px;
+        }
+
+        .eyebrow {
+            color: var(--muted);
+            margin: 0 0 5px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 29px;
+            letter-spacing: -0.8px;
+        }
+
+        h2 {
+            margin: 0 0 17px;
+            font-size: 18px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .search {
+            width: 220px;
+            border: 1px solid var(--line);
+            background: white;
+            border-radius: 10px;
+            padding: 10px 14px;
+            outline: none;
+        }
+
+        .search:focus {
+            border-color: #a5b4fc;
+            box-shadow: 0 0 0 3px #eef2ff;
+        }
+
+        .avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #e0e7ff;
+            color: #4338ca;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            flex: 0 0 auto;
+        }
+
+        .hero {
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(125deg, #4338ca 0%, #6366f1 58%, #818cf8 100%);
+            border-radius: 18px;
+            padding: 27px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 14px 30px #4f46e524;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            right: 110px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .08);
+        }
+
+        .hero h2 {
+            font-size: 24px;
+            margin: 0 0 7px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #e0e7ff;
+        }
+
+        .hero-illustration {
+            position: relative;
+            z-index: 1;
+            width: 82px;
+            height: 82px;
+            border-radius: 22px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .14);
+            font-size: 38px;
+            transform: rotate(3deg);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 6px 18px rgba(29, 45, 79, .055);
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 19px;
+        }
+
+        .stat:nth-child(1) .stat-icon {
+            background: #eef2ff;
+            color: var(--primary);
+        }
+
+        .stat:nth-child(2) .stat-icon {
+            background: #ecfeff;
+            color: var(--cyan);
+        }
+
+        .stat:nth-child(3) .stat-icon {
+            background: #ecfdf5;
+            color: var(--green);
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 24px;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat span {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(280px, 1fr);
+            gap: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .text-button {
+            border: 0;
+            background: transparent;
+            color: var(--primary);
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .topic {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 12px 6px;
+            border-bottom: 1px solid var(--line);
+            cursor: pointer;
+            transition: .18s ease;
+        }
+
+        .topic:last-child {
+            border-bottom: 0;
+        }
+
+        .topic:hover,
+        .topic.selected {
+            background: #f7f7ff;
+            padding-left: 10px;
+            border-radius: 8px;
+        }
+
+        .topic-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            background: #f0f2ff;
+        }
+
+        .topic-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .topic-info strong {
+            display: block;
+            margin-bottom: 7px;
+        }
+
+        .progress {
+            height: 7px;
+            background: #edf0f5;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .progress i {
+            display: block;
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #818cf8);
+            border-radius: 20px;
+        }
+
+        .percent {
+            color: var(--muted);
+            font-size: 12px;
+            width: 42px;
+            text-align: right;
+        }
+
+        .flashcard {
+            min-height: 190px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            background: linear-gradient(145deg, #fff, #f6f7ff);
+            border: 1px solid #e2e5fb;
+            border-radius: 14px;
+            cursor: pointer;
+            padding: 20px;
+        }
+
+        .flashcard p {
+            color: var(--muted);
+        }
+
+        .answer {
+            display: none;
+            color: var(--primary);
+            font-weight: 800;
+            line-height: 1.5;
+        }
+
+        .flashcard.flipped .question {
+            display: none;
+        }
+
+        .flashcard.flipped .answer {
+            display: block;
+        }
+
+        .flashcard-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .flashcard-controls button {
+            flex: 1;
+            border: 0;
+            border-radius: 9px;
+            padding: 11px;
+            background: #eeedff;
+            color: #4338ca;
+            font-weight: 750;
+            cursor: pointer;
+        }
+
+        .flashcard-controls button:hover {
+            background: #dedcff;
+        }
+
+        .status {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            background:
+                radial-gradient(circle at 12% 18%, rgba(129, 140, 248, .22), transparent 24%),
+                linear-gradient(135deg, #111827, #1e293b 58%, #312e81);
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-card {
+            width: min(430px, 100%);
+            background: rgba(255, 255, 255, .98);
+            border: 1px solid rgba(255, 255, 255, .55);
+            border-radius: 22px;
+            padding: 38px;
+            box-shadow: 0 24px 70px rgba(0, 0, 0, .28);
+            transition: width .3s ease;
+        }
+
+        .login-card.mode-register {
+            width: min(470px, 100%);
+        }
+
+        .login-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 28px;
+            color: var(--ink);
+            font-size: 21px;
+            font-weight: 800;
+        }
+
+        .login-card h2 {
+            margin: 0 0 8px;
+            font-size: 28px;
+            letter-spacing: -.6px;
+        }
+
+        .login-subtitle {
+            margin: 0 0 24px;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .login-field {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .login-field label {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .login-field input {
+            width: 100%;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 13px 14px;
+            color: var(--ink);
+            background: white;
+            outline: none;
+        }
+
+        .login-field input:focus {
+            border-color: #818cf8;
+            box-shadow: 0 0 0 3px #eef2ff;
+        }
+
+        .login-button {
+            width: 100%;
+            border: 0;
+            border-radius: 10px;
+            padding: 13px;
+            margin-top: 4px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 10px 22px rgba(79, 70, 229, .22);
+        }
+
+        .login-button:hover {
+            filter: brightness(1.05);
+        }
+
+        .login-error {
+            min-height: 18px;
+            margin: 10px 0 0;
+            color: #dc2626;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .logout-button {
+            border: 1px solid rgba(255, 255, 255, .12);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .06);
+            color: #d1d5db;
+            padding: 8px 10px;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        .logout-button:hover {
+            background: rgba(255, 255, 255, .12);
+            color: white;
+        }
+
+        .auth-switch {
+            margin: 18px 0 0;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .auth-switch button {
+            border: 0;
+            background: transparent;
+            color: var(--primary);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .auth-panel.hidden {
+            display: none;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .login-card.hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 980px) {
+            .app {
+                grid-template-columns: 82px 1fr;
+            }
+
+            aside {
+                padding: 24px 12px;
+            }
+
+            .brand {
+                margin-inline: 8px;
+            }
+
+            .brand span:last-child,
+            nav button:not(.active) span:last-child,
+            nav button.active span:last-child,
+            .profile-mini div {
+                display: none;
+            }
+
+            nav button {
+                text-align: center;
+                padding: 13px 4px;
+            }
+
+            .nav-icon {
+                width: 100% !important;
+            }
+
+            nav button.active::before {
+                left: -12px;
+            }
+
+            .profile-mini {
+                justify-content: center;
+            }
+
+            main {
+                padding-inline: 24px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .app {
+                grid-template-columns: 1fr;
+            }
+
+            aside {
+                position: static;
+                height: auto;
+                padding: 10px 14px;
+            }
+
+            .brand,
+            .profile-mini {
+                display: none;
+            }
+
+            nav {
+                grid-template-columns: repeat(5, 1fr);
+            }
+
+            nav button {
+                padding: 9px 4px;
+            }
+
+            nav button.active::before {
+                display: none;
+            }
+
+            main {
+                padding: 20px 14px 40px;
+            }
+
+            header {
+                align-items: flex-start;
+            }
+
+            .search {
+                display: none;
+            }
+
+            .stats,
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero {
+                padding: 22px;
+            }
+
+            .hero-illustration {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+            }
+        }
+    </style>
+    <style id="campus-portal-style">
+        body>.login-screen,
+        body>.app {
+            display: grid;
+        }
+
+        #loginScreen.hidden,
+        #campusApp.hidden {
+            display: none !important;
+        }
+
+        body #campusApp {
+            display: none;
+        }
+
+        body #campusApp.authenticated {
+            display: grid;
+        }
+
+        #campusApp {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 238px minmax(0, 1fr);
+            background: var(--campus-bg);
+        }
+
+        #campusApp * {
+            box-sizing: border-box;
+        }
+
+        #campusApp button,
+        #campusApp input,
+        #campusApp select {
+            font: inherit;
+        }
+
+        #campusSidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            padding: 26px 18px 20px;
+            background:
+                radial-gradient(circle at 20% 85%, rgba(79, 70, 229, .25), transparent 30%),
+                linear-gradient(160deg, #111827 0%, #172554 62%, #1e3a8a 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, .08);
+            box-shadow: 12px 0 30px rgba(15, 23, 42, .08);
+        }
+
+        #campusSidebar::before {
+            content: "";
+            position: absolute;
+            width: 180px;
+            height: 180px;
+            left: -120px;
+            top: 120px;
+            border-radius: 50%;
+            background: rgba(96, 165, 250, .12);
+            filter: blur(2px);
+        }
+
+        .campus-brand {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 8px 28px;
+            font-size: 20px;
+            font-weight: 850;
+        }
+
+        .campus-brand-mark {
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            border-radius: 13px;
+            background: linear-gradient(135deg, #60a5fa, #4f46e5);
+            box-shadow: 0 10px 24px rgba(79, 70, 229, .38);
+            border: 1px solid rgba(255, 255, 255, .18);
+        }
+
+        .campus-nav {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            gap: 8px;
+        }
+
+        .campus-nav button {
+            width: 100%;
+            border: 1px solid transparent;
+            border-radius: 12px;
+            padding: 13px 14px;
+            color: #c7d2fe;
+            background: transparent;
+            text-align: left;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .campus-nav button span {
+            display: inline-block;
+            width: 28px;
+            text-align: center;
+            color: #93c5fd;
+        }
+
+        .campus-nav button.active,
+        .campus-nav button:hover {
+            background: linear-gradient(90deg, rgba(96, 165, 250, .22), rgba(129, 140, 248, .12));
+            border-color: rgba(147, 197, 253, .16);
+            color: white;
+            transform: translateX(2px);
+            box-shadow: inset 3px 0 0 #60a5fa;
+        }
+
+        .campus-profile {
+            position: relative;
+            z-index: 1;
+            margin-top: auto;
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .055);
+            backdrop-filter: blur(8px);
+            padding: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .campus-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #dbeafe, #c7d2fe);
+            color: #3730a3;
+            font-weight: 850;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, .18);
+        }
+
+        .campus-profile strong,
+        .campus-profile small {
+            display: block;
+        }
+
+        .campus-profile small {
+            margin-top: 3px;
+            color: #b9c8df;
+        }
+
+        #campusMain {
+            min-width: 0;
+            padding: 24px 34px 44px;
+        }
+
+        .campus-topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 22px;
+        }
+
+        .campus-topbar h1 {
+            margin: 3px 0 0;
+            font-size: 28px;
+            letter-spacing: -.7px;
+        }
+
+        .campus-date {
+            color: var(--campus-muted);
+            font-size: 13px;
+            font-weight: 750;
+        }
+
+        .campus-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .campus-actions input {
+            width: 220px;
+            border: 1px solid var(--campus-line);
+            border-radius: 10px;
+            background: white;
+            padding: 10px 13px;
+        }
+
+        .notification {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--campus-line);
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .campus-view {
+            display: none;
+        }
+
+        .campus-view.active {
+            display: block;
+        }
+
+        .welcome-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            min-height: 150px;
+            margin-bottom: 18px;
+            padding: 25px 28px;
+            border-radius: 17px;
+            color: white;
+            background: linear-gradient(120deg, #285fc1, #477fe3);
+            box-shadow: 0 13px 28px #316fea28;
+        }
+
+        .welcome-card h2 {
+            margin: 0 0 8px;
+            font-size: 23px;
+        }
+
+        .welcome-card p {
+            margin: 0;
+            color: #dfeaff;
+        }
+
+        .welcome-illustration {
+            width: 90px;
+            height: 90px;
+            border-radius: 24px;
+            display: grid;
+            place-items: center;
+            background: rgba(255, 255, 255, .14);
+            font-size: 42px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .summary-card,
+        .panel {
+            border: 1px solid var(--campus-line);
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 5px 16px rgba(29, 45, 79, .045);
+        }
+
+        .summary-card {
+            padding: 17px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .summary-icon {
+            width: 43px;
+            height: 43px;
+            border-radius: 11px;
+            display: grid;
+            place-items: center;
+            background: var(--campus-sky);
+            color: var(--campus-blue);
+        }
+
+        .summary-card strong {
+            display: block;
+            font-size: 21px;
+        }
+
+        .summary-card span {
+            color: var(--campus-muted);
+            font-size: 12px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1.45fr .75fr;
+            gap: 16px;
+        }
+
+        .panel {
+            padding: 20px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .panel-header button {
+            border: 0;
+            background: transparent;
+            color: var(--campus-blue);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .schedule-row {
+            display: grid;
+            grid-template-columns: 72px 1fr 86px;
+            align-items: center;
+            gap: 12px;
+            min-height: 68px;
+            border-bottom: 1px solid var(--campus-line);
+        }
+
+        .schedule-row:last-child {
+            border-bottom: 0;
+        }
+
+        .schedule-time {
+            color: var(--campus-muted);
+            font-size: 12px;
+        }
+
+        .subject strong,
+        .subject span {
+            display: block;
+        }
+
+        .subject strong {
+            font-size: 14px;
+        }
+
+        .subject span {
+            margin-top: 4px;
+            color: var(--campus-muted);
+            font-size: 12px;
+        }
+
+        .room {
+            justify-self: end;
+            border-radius: 20px;
+            padding: 6px 9px;
+            background: var(--campus-sky);
+            color: var(--campus-blue);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .assignment-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--campus-line);
+        }
+
+        .assignment-item:last-child {
+            border-bottom: 0;
+        }
+
+        .due-date {
+            width: 48px;
+            height: 52px;
+            border-radius: 9px;
+            display: grid;
+            place-items: center;
+            text-align: center;
+            background: #fff4ed;
+            color: var(--campus-red);
+            font-weight: 850;
+        }
+
+        .due-date span {
+            display: block;
+            font-size: 10px;
+        }
+
+        .assignment-info {
+            flex: 1;
+        }
+
+        .assignment-info strong,
+        .assignment-info span {
+            display: block;
+        }
+
+        .assignment-info span {
+            margin-top: 5px;
+            color: var(--campus-muted);
+            font-size: 12px;
+        }
+
+        .view-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .view-toolbar h2 {
+            margin: 0;
+        }
+
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .day-tabs button {
+            border: 1px solid var(--campus-line);
+            border-radius: 9px;
+            background: white;
+            color: var(--campus-muted);
+            padding: 9px 13px;
+            cursor: pointer;
+        }
+
+        .day-tabs button.active {
+            border-color: var(--campus-blue);
+            background: var(--campus-blue);
+            color: white;
+        }
+
+        .timetable-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .timetable-card {
+            border: 1px solid var(--campus-line);
+            border-left: 4px solid var(--campus-blue);
+            border-radius: 12px;
+            background: white;
+            padding: 16px;
+        }
+
+        .timetable-card.orange {
+            border-left-color: var(--campus-orange);
+        }
+
+        .timetable-card.green {
+            border-left-color: var(--campus-green);
+        }
+
+        .timetable-card .time {
+            color: var(--campus-blue);
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        .timetable-card h3 {
+            margin: 9px 0 5px;
+            font-size: 15px;
+        }
+
+        .timetable-card p {
+            margin: 0;
+            color: var(--campus-muted);
+            font-size: 12px;
+        }
+
+        .assignment-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .assignment-table th {
+            text-align: left;
+            color: var(--campus-muted);
+            font-size: 11px;
+            letter-spacing: .5px;
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--campus-line);
+        }
+
+        .assignment-table td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--campus-line);
+            font-size: 13px;
+        }
+
+        .status-pill {
+            display: inline-block;
+            border-radius: 20px;
+            padding: 6px 9px;
+            background: #fff2e6;
+            color: #a75b18;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .status-pill.done {
+            background: #e9f8f2;
+            color: var(--campus-green);
+        }
+
+        .holiday-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .holiday-card {
+            overflow: hidden;
+            border: 1px solid var(--campus-line);
+            border-radius: 14px;
+            background: white;
+        }
+
+        .holiday-date {
+            height: 82px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, #eaf2ff, #f7faff);
+            color: var(--campus-blue);
+            text-align: center;
+        }
+
+        .holiday-date strong {
+            display: block;
+            font-size: 28px;
+        }
+
+        .holiday-date span {
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .holiday-body {
+            padding: 16px;
+        }
+
+        .holiday-body h3 {
+            margin: 0 0 6px;
+            font-size: 15px;
+        }
+
+        .holiday-body p {
+            margin: 0;
+            color: var(--campus-muted);
+            font-size: 12px;
+        }
+
+        @media (max-width: 1050px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 820px) {
+            #campusApp {
+                grid-template-columns: 74px 1fr;
+            }
+
+            #campusSidebar {
+                padding-inline: 10px;
+            }
+
+            .campus-brand {
+                justify-content: center;
+                padding-inline: 0;
+            }
+
+            .campus-brand-name,
+            .campus-nav button span+text,
+            .campus-profile div:last-child {
+                display: none;
+            }
+
+            .campus-nav button {
+                text-align: center;
+            }
+
+            .campus-nav button span {
+                width: 100%;
+            }
+
+            #campusMain {
+                padding: 24px 18px;
+            }
+
+            .timetable-grid,
+            .holiday-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            #campusApp {
+                grid-template-columns: 1fr;
+            }
+
+            #campusSidebar {
+                position: static;
+                height: auto;
+                padding: 10px;
+            }
+
+            .campus-brand {
+                display: none;
+            }
+
+            .campus-profile {
+                display: none;
+            }
+
+            .campus-nav {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .campus-nav button {
+                text-align: center;
+                padding: 10px 4px;
+            }
+
+            .campus-nav button span {
+                display: block;
+                margin-bottom: 3px;
+            }
+
+            .campus-actions input {
+                display: none;
+            }
+
+            .summary-grid,
+            .timetable-grid,
+            .holiday-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .welcome-card {
+                padding: 20px;
+            }
+
+            .welcome-illustration {
+                width: 64px;
+                height: 64px;
+                font-size: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="campusApp">
+        <aside id="campusSidebar">
+            <div class="campus-brand">
+                <div class="campus-brand-mark">C</div>
+                <div class="campus-brand-name">Campus Portal</div>
+            </div>
+            <nav class="campus-nav">
+                <button class="active" data-view="dashboard"><span>⌂</span> Dashboard</button>
+                <button data-view="timetable"><span>▦</span> Timetable</button>
+                <button data-view="assignments"><span>✓</span> Assignments</button>
+                <button data-view="holidays"><span>◷</span> Holidays</button>
+            </nav>
+            <div class="campus-profile">
+                <div class="campus-avatar" id="campusProfileAvatar">A</div>
+                <div><strong id="campusProfileName">Alex Student</strong><small id="campusProfileCourse">Computer
+                        Science</small><button id="campusLogout" type="button"
+                        style="margin-top:8px;border:1px solid rgba(255,255,255,.12);border-radius:8px;background:rgba(255,255,255,.08);color:#e0e7ff;padding:7px 9px;cursor:pointer;font-size:11px;transition:.2s">Sign
+                        out</button></div>
+            </div>
+        </aside>
+
+        <main id="campusMain">
+            <header class="campus-topbar">
+                <div><span class="campus-date" id="campusDate">MONDAY, 24 NOVEMBER</span>
+                    <h1 id="campusTitle">Good morning, Alex!</h1>
+                </div>
+                <div class="campus-actions"><input id="campusSearch" type="search"
+                        placeholder="Search courses, classes..."><button class="notification" type="button"
+                        aria-label="Notifications">♢</button>
+                    <div class="campus-avatar">A</div>
+                </div>
+            </header>
+
+            <section class="campus-view active" id="dashboardView">
+                <div class="welcome-card">
+                    <div>
+                        <h2>Welcome to your campus dashboard</h2>
+                        <p>Stay on top of classes, deadlines, and upcoming holidays.</p>
+                    </div>
+                    <div class="welcome-illustration">🎓</div>
+                </div>
+                <section class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-icon">▦</div>
+                        <div><strong>5</strong><span>Classes today</span></div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon">✓</div>
+                        <div><strong>3</strong><span>Assignments due</span></div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon">◷</div>
+                        <div><strong>2</strong><span>Holidays upcoming</span></div>
+                    </div>
+                    <div class="summary-card">
+                        <div class="summary-icon">▥</div>
+                        <div><strong>92%</strong><span>Attendance</span></div>
+                    </div>
+                </section>
+                <section class="dashboard-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Today's timetable</h2><button type="button" data-go="timetable">View all</button>
+                        </div>
+                        <div class="schedule-row">
+                            <div class="schedule-time">09:00 AM</div>
+                            <div class="subject"><strong>Database Management</strong><span>Prof. Sharma · Lecture</span>
+                            </div>
+                            <div class="room">Room 204</div>
+                        </div>
+                        <div class="schedule-row">
+                            <div class="schedule-time">11:00 AM</div>
+                            <div class="subject"><strong>Computer Networks</strong><span>Prof. Patel · Lecture</span>
+                            </div>
+                            <div class="room">Lab 02</div>
+                        </div>
+                        <div class="schedule-row">
+                            <div class="schedule-time">02:00 PM</div>
+                            <div class="subject"><strong>Operating Systems</strong><span>Prof. Singh · Tutorial</span>
+                            </div>
+                            <div class="room">Room 118</div>
+                        </div>
+                        <div class="schedule-row">
+                            <div class="schedule-time">04:00 PM</div>
+                            <div class="subject"><strong>Web Development Lab</strong><span>Prof. Mehta ·
+                                    Practical</span></div>
+                            <div class="room">Lab 05</div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2>Upcoming assignments</h2><button type="button" data-go="assignments">View all</button>
+                        </div>
+                        <div class="assignment-item">
+                            <div class="due-date">26<span>NOV</span></div>
+                            <div class="assignment-info"><strong>SQL Case Study</strong><span>Database Management</span>
+                            </div>
+                        </div>
+                        <div class="assignment-item">
+                            <div class="due-date">28<span>NOV</span></div>
+                            <div class="assignment-info"><strong>Network Topology Report</strong><span>Computer
+                                    Networks</span></div>
+                        </div>
+                        <div class="assignment-item">
+                            <div class="due-date">01<span>DEC</span></div>
+                            <div class="assignment-info"><strong>Process Scheduling</strong><span>Operating
+                                    Systems</span></div>
+                        </div>
+                    </div>
+                </section>
+            </section>
+
+            <section class="campus-view" id="timetableView">
+                <div class="view-toolbar">
+                    <h2>Weekly timetable</h2>
+                    <div class="day-tabs"><button class="active" type="button">Mon</button><button
+                            type="button">Tue</button><button type="button">Wed</button><button
+                            type="button">Thu</button><button type="button">Fri</button></div>
+                </div>
+                <div class="panel timetable-grid">
+                    <article class="timetable-card">
+                        <div class="time">09:00 – 10:30</div>
+                        <h3>Database Management</h3>
+                        <p>Prof. Sharma · Room 204</p>
+                    </article>
+                    <article class="timetable-card orange">
+                        <div class="time">11:00 – 12:30</div>
+                        <h3>Computer Networks</h3>
+                        <p>Prof. Patel · Lab 02</p>
+                    </article>
+                    <article class="timetable-card green">
+                        <div class="time">14:00 – 15:30</div>
+                        <h3>Operating Systems</h3>
+                        <p>Prof. Singh · Room 118</p>
+                    </article>
+                    <article class="timetable-card">
+                        <div class="time">16:00 – 17:30</div>
+                        <h3>Web Development Lab</h3>
+                        <p>Prof. Mehta · Lab 05</p>
+                    </article>
+                    <article class="timetable-card orange">
+                        <div class="time">17:30 – 18:30</div>
+                        <h3>Project Mentoring</h3>
+                        <p>Dr. Rao · Online</p>
+                    </article>
+                </div>
+            </section>
+
+            <section class="campus-view" id="assignmentsView">
+                <div class="view-toolbar">
+                    <h2>Assignments</h2>
+                    <div class="day-tabs"><button class="active" type="button">All</button><button
+                            type="button">Pending</button><button type="button">Submitted</button></div>
+                </div>
+                <div class="panel">
+                    <table class="assignment-table">
+                        <thead>
+                            <tr>
+                                <th>ASSIGNMENT</th>
+                                <th>SUBJECT</th>
+                                <th>DUE DATE</th>
+                                <th>STATUS</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>SQL Case Study</td>
+                                <td>Database Management</td>
+                                <td>26 Nov 2026</td>
+                                <td><span class="status-pill">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>Network Topology Report</td>
+                                <td>Computer Networks</td>
+                                <td>28 Nov 2026</td>
+                                <td><span class="status-pill">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>Process Scheduling</td>
+                                <td>Operating Systems</td>
+                                <td>01 Dec 2026</td>
+                                <td><span class="status-pill">Pending</span></td>
+                            </tr>
+                            <tr>
+                                <td>Responsive Portfolio</td>
+                                <td>Web Development</td>
+                                <td>18 Nov 2026</td>
+                                <td><span class="status-pill done">Submitted</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="campus-view" id="holidaysView">
+                <div class="view-toolbar">
+                    <h2>Upcoming holidays</h2><button class="notification" type="button">2026</button>
+                </div>
+                <div class="holiday-grid">
+                    <article class="holiday-card">
+                        <div class="holiday-date">
+                            <div><strong>25</strong><span>DECEMBER</span></div>
+                        </div>
+                        <div class="holiday-body">
+                            <h3>Christmas</h3>
+                            <p>Campus closed · Thursday</p>
+                        </div>
+                    </article>
+                    <article class="holiday-card">
+                        <div class="holiday-date">
+                            <div><strong>01</strong><span>JANUARY</span></div>
+                        </div>
+                        <div class="holiday-body">
+                            <h3>New Year's Day</h3>
+                            <p>Campus closed · Friday</p>
+                        </div>
+                    </article>
+                    <article class="holiday-card">
+                        <div class="holiday-date">
+                            <div><strong>26</strong><span>JANUARY</span></div>
+                        </div>
+                        <div class="holiday-body">
+                            <h3>Republic Day</h3>
+                            <p>Campus closed · Monday</p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <section class="login-screen" id="loginScreen" aria-label="Student login">
+        <form class="login-card" id="loginForm">
+            <div class="login-brand"><span class="brand-mark">C</span><span>Campus Portal</span></div>
+            <h2>Welcome back</h2>
+            <p class="login-subtitle">Sign in to view your timetable and campus updates.</p>
+            <div class="login-field">
+                <label for="username">Username</label>
+                <input id="username" name="username" type="text" autocomplete="username"
+                    placeholder="Enter your username" required>
+            </div>
+            <div class="login-field">
+                <label for="password">Password</label>
+                <input id="password" name="password" type="password" autocomplete="current-password"
+                    placeholder="Enter your password" required>
+            </div>
+            <button class="login-button" type="submit">Sign in</button>
+            <p class="login-error" id="loginError" role="alert"></p>
+            <div class="auth-switch">
+                <span>New user?</span> <button type="button" id="showRegister">Create an account</button>
+            </div>
+        </form>
+        <form class="login-card hidden" id="registerForm">
+            <div class="login-brand"><span class="brand-mark">C</span><span>Campus Portal</span></div>
+            <h2>Join Campus Portal</h2>
+            <p class="login-subtitle">Create an account to access your student timetable.</p>
+            <div class="login-field">
+                <label for="fullName">Full name</label>
+                <input id="fullName" name="name" type="text" autocomplete="name" placeholder="Enter your name">
+            </div>
+            <div class="login-field">
+                <label for="newUsername">Username</label>
+                <input id="newUsername" name="username" type="text" autocomplete="username"
+                    placeholder="Choose a username" required>
+            </div>
+            <div class="login-field">
+                <label for="email">Email</label>
+                <input id="email" name="email" type="email" autocomplete="email" placeholder="Enter your email"
+                    required>
+            </div>
+            <div class="login-field">
+                <label for="newPassword">Password</label>
+                <input id="newPassword" name="password" type="password" autocomplete="new-password"
+                    placeholder="Create a password" required>
+            </div>
+            <button class="login-button" type="submit">Sign up</button>
+            <p class="login-error" id="registerError" role="alert"></p>
+            <div class="auth-switch">
+                <span>Already have an account?</span> <button type="button" id="showLogin">Sign in</button>
+            </div>
+        </form>
+    </section>
+
+    <script>
+        const campusTitle = document.getElementById('campusTitle');
+        async function registerCampusAccount(name, username, email, password) {
+            try {
+                const response = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, username, email, password })
+                });
+                const data = await response.json();
+                return { ok: response.ok, message: data.error || '' };
+            } catch (error) {
+                return { ok: false, message: 'Unable to connect to the server.' };
+            }
+        }
+
+        async function loginCampusAccount(username, password) {
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+                const data = await response.json();
+                return { ok: response.ok, name: data.name, username: data.username, message: data.error || '' };
+            } catch (error) {
+                return { ok: false, message: 'Unable to connect to the server.' };
+            }
+        }
+
+        const loginScreen = document.getElementById('loginScreen');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginError = document.getElementById('loginError');
+        const registerError = document.getElementById('registerError');
+        const campusApp = document.getElementById('campusApp');
+
+        function enterCampus(username, displayName) {
+            const name = (displayName || username || 'Alex Student').trim();
+            sessionStorage.setItem('campusUsername', username);
+            sessionStorage.setItem('campusName', name);
+            loginScreen.classList.add('hidden');
+            campusApp.classList.add('authenticated');
+            document.getElementById('campusProfileName').textContent = name;
+            document.getElementById('campusProfileAvatar').textContent = name.charAt(0).toUpperCase();
+            document.querySelector('.campus-actions .campus-avatar').textContent = name.charAt(0).toUpperCase();
+            campusTitle.textContent = `Good morning, ${name.split(' ')[0]}!`;
+        }
+
+        loginForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                loginError.textContent = 'Please enter both username and password.';
+                return;
+            }
+
+            loginError.textContent = 'Signing in...';
+            const result = await loginCampusAccount(username, password);
+            if (result.ok) {
+                enterCampus(result.username || username, result.name);
+            } else {
+                loginError.textContent = result.message || 'Invalid username or password.';
+            }
+        });
+
+        registerForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const name = document.getElementById('fullName').value.trim();
+            const username = document.getElementById('newUsername').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('newPassword').value;
+
+            if (!username || !email || !password) {
+                registerError.textContent = 'Please complete all required fields.';
+                return;
+            }
+
+            registerError.textContent = 'Creating your account...';
+            const result = await registerCampusAccount(name, username, email, password);
+            if (result.ok) {
+                registerForm.reset();
+                registerForm.classList.add('hidden');
+                loginForm.classList.remove('hidden');
+                loginForm.querySelector('#username').value = username;
+                loginForm.querySelector('#password').value = '';
+                loginError.textContent = 'Account created! Sign in to continue.';
+                document.getElementById('password').focus();
+            } else {
+                registerError.textContent = result.message;
+            }
+        });
+
+        document.getElementById('showRegister')?.addEventListener('click', () => {
+            loginError.textContent = '';
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            document.getElementById('fullName').focus();
+        });
+
+        document.getElementById('showLogin')?.addEventListener('click', () => {
+            registerError.textContent = '';
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            document.getElementById('username').focus();
+        });
+
+        document.getElementById('campusLogout').addEventListener('click', () => {
+            fetch('/api/logout', { method: 'POST' }).catch(() => { });
+            sessionStorage.removeItem('campusUsername');
+            sessionStorage.removeItem('campusName');
+            campusApp.classList.remove('authenticated');
+            loginScreen.classList.remove('hidden');
+            loginForm.reset();
+            registerForm.reset();
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            loginError.textContent = '';
+            registerError.textContent = '';
+            document.getElementById('username').focus();
+        });
+
+        const savedCampusUsername = sessionStorage.getItem('campusUsername');
+        const savedCampusName = sessionStorage.getItem('campusName');
+        if (savedCampusUsername) {
+            enterCampus(savedCampusUsername, savedCampusName);
+        }
+
+        const viewNames = {
+            dashboard: 'Good morning, Alex!',
+            timetable: 'Weekly timetable',
+            assignments: 'Assignments overview',
+            holidays: 'Holiday calendar'
+        };
+
+        function showCampusView(viewName) {
+            document.querySelectorAll('.campus-view').forEach(view => view.classList.remove('active'));
+            document.querySelectorAll('.campus-nav button').forEach(button => button.classList.remove('active'));
+
+            const target = document.getElementById(`${viewName}View`);
+            const navButton = document.querySelector(`.campus-nav button[data-view="${viewName}"]`);
+            if (target) target.classList.add('active');
+            if (navButton) navButton.classList.add('active');
+            campusTitle.textContent = viewNames[viewName] || viewNames.dashboard;
+        }
+
+        document.querySelectorAll('.campus-nav button').forEach(button => {
+            button.addEventListener('click', () => showCampusView(button.dataset.view));
+        });
+
+        document.querySelectorAll('[data-go]').forEach(button => {
+            button.addEventListener('click', () => showCampusView(button.dataset.go));
+        });
+
+        document.querySelectorAll('.day-tabs').forEach(tabGroup => {
+            tabGroup.addEventListener('click', event => {
+                const button = event.target.closest('button');
+                if (!button) return;
+                tabGroup.querySelectorAll('button').forEach(tab => tab.classList.remove('active'));
+                button.classList.add('active');
+            });
+        });
+
+        document.getElementById('campusSearch').addEventListener('input', event => {
+            const query = event.target.value.trim().toLowerCase();
+            document.querySelectorAll('.timetable-card, .assignment-table tbody tr, .holiday-card').forEach(item => {
+                item.style.display = !query || item.textContent.toLowerCase().includes(query) ? '' : 'none';
+            });
+        });
+
+        const now = new Date();
+        document.getElementById('campusDate').textContent = now.toLocaleDateString('en-US', {
+            weekday: 'long', day: '2-digit', month: 'long'
+        }).toUpperCase();
+    </script>
+</body>
+
+</html>
